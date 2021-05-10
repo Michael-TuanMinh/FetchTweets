@@ -6,10 +6,7 @@ using UnityEngine.Networking;
 using System.Collections;
 using Web.Twitter.DataStructures;
 
-
-namespace MyNamespace
-{ 
-    public class TwitterManager : MonoBehaviour
+public class TwitterManager : MonoBehaviour
 {
     [SerializeField]
     private string twitterApiConsumerKey;
@@ -23,11 +20,7 @@ namespace MyNamespace
     private Token token;
 
     public SearchResults results; // TODO: Set it to private in production
-
-    private void Start()
-    {
-        StartCoroutine(GetTwitterApiAccessToken(twitterApiConsumerKey, twitterApiConsumerSecret));
-    }
+    
 
     public void Search(string _keyWord, int _maxTweet, string _lang, string _seachType)
     {
@@ -100,6 +93,5 @@ namespace MyNamespace
         }
     }
         
-}
 }
 

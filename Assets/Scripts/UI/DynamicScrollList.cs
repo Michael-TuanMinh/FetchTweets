@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using MyNamespace;
+using System.Net.Http.Headers;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -170,15 +170,6 @@ public class DynamicScrollList : MonoBehaviour
                     : new Vector2(0, - mCanvas.GetComponent<RectTransform>().rect.height * (swiper.currentPage - 1));
                 pool.Enqueue(newPage);
                 
-                if (swiper.currentPage > ItemHolder.transform.childCount)
-                {
-                    swiper.gapPage++;
-                }
-                else if(swiper.gapPage > ItemHolder.transform.childCount)
-                {
-                    swiper.gapPage--;
-                }
-
                 /*if (swiper.currentPage < twitterManager.results.statuses.Length)
                 {
                     var _publicName = twitterManager.results.statuses[swiper.currentPage - 1].user.screen_name;
@@ -199,6 +190,7 @@ public class DynamicScrollList : MonoBehaviour
             GameObject panel = Instantiate(panelClone, mCanvas.transform, false);
             panel.transform.SetParent(ItemHolder.transform);
             panel.name = "Page-" + i;
+            panel.AddComponent<Page>();
             
             if (usingPool)
             {
@@ -235,8 +227,7 @@ public class DynamicScrollList : MonoBehaviour
         for (int i = 1; i <= numberOfIcons; i++)
         {
             itemsCounter++;
-            GameObject icon = Instantiate(Item) as GameObject;
-            icon.transform.SetParent(mCanvas.transform, false);
+            GameObject icon = Instantiate(Item, mCanvas.transform, false);
             icon.transform.SetParent(parentObject.transform);
             tweets.Add(icon);
 
@@ -250,24 +241,7 @@ public class DynamicScrollList : MonoBehaviour
             }*/
         }
     }
-
-    public void RefreshAllElements()
-    {
-        /*for (int i = 0; i < tweets.Count; i++)
-        {
-            if (i >= twitterManager.results.statuses.Length)
-            {
-                i = twitterManager.results.statuses.Length - 1;
-            }
-            
-            var _publicName = twitterManager.results.statuses[i].user.screen_name;
-            var _id = twitterManager.results.statuses[i].user.name;
-            var _tweet = twitterManager.results.statuses[i].text;
-            var _url = twitterManager.results.statuses[i].user.profile_image_url;
-            tweets[i].GetComponent<Tweet>().LoadTweet(_url, _publicName, _id, _tweet);
-        }*/
-    }
-
+    
     private void OnDisable() 
     {
         if(refreshAfterEnable)
@@ -286,9 +260,7 @@ public class DynamicScrollList : MonoBehaviour
             }
 
             dots.Clear();
-
         }
-        
     }
 
     public void OnFinishedSearching(int numOfResults)
@@ -298,63 +270,53 @@ public class DynamicScrollList : MonoBehaviour
             numberOfItems =  numOfResults;
             Spawn();
         }
-        else if (numOfResults > numberOfItems)
+        else
         {
-            PageSwiper swiper = ItemHolder.AddComponent<PageSwiper>();
+            var swiper = GetComponentInChildren<PageSwiper>();
             swiper.totalPages = numOfResults;
+            swiper.ResetSwiper();
 
-            if (numOfResults < dots.Count)
+            foreach (var page in pool)
             {
-                // if the number of results is less than the amount of dots that were already spawned in the pool
-                for (int i = numberOfItems; i < numOfResults; i++)
+                page.GetComponent<Page>().ResetPosition();
+            }
+
+            if (numOfResults > numberOfItems)
+            {
+                if (numOfResults < dots.Count)
                 {
-                    dots[i].gameObject.SetActive(true);
+                    // if the number of results is less than the amount of dots that were already spawned in the pool
+                    for (int i = numberOfItems; i < numOfResults; i++)
+                    {
+                        dots[i].gameObject.SetActive(true);
+                    }
+                }
+                else
+                {
+                    // if the amount of results is more than pool's size, enable all items in the pool first, then instantiate more 
+                
+                    for (int i = numberOfItems; i < dots.Count; i++)
+                    {
+                        dots[i].gameObject.SetActive(true);
+                    }
+                
+                    for (int i = 0; i < numOfResults - numberOfItems; i++)
+                    {
+                        GameObject newDot = Instantiate(dotObj, dotsContainer);
+                        dots.Add(newDot.GetComponent<RectTransform>());
+                    }
                 }
             }
             else
             {
-                // if the amount of results is more than pool's size, enable all items in the pool first, then instantiate more 
-                
-                for (int i = numberOfItems; i < dots.Count; i++)
+                for (int i = 1; i <= numberOfItems - numOfResults; i++)
                 {
-                    dots[i].gameObject.SetActive(true);
-                }
-                
-                for (int i = 0; i < numOfResults - numberOfItems; i++)
-                {
-                    GameObject newDot = Instantiate(dotObj, dotsContainer);
-                    dots.Add(newDot.GetComponent<RectTransform>());
+                    dots[numberOfItems - i].gameObject.SetActive(false);
                 }
             }
-            
+
             numberOfItems = numOfResults;
             UpdateDotsColor(1);
-        }
-        else
-        {
-            for (int i = 1; i <= numberOfItems - numOfResults; i++)
-            {
-                dots[numberOfItems - i].gameObject.SetActive(false);
-            }
-            
-            numberOfItems = numOfResults;
-            UpdateDotsColor(1);
-        }
-    }
-
-    public void RespawnDots(int amount)
-    {
-        for (int i = 0; i < dotsContainer.childCount; i++)
-        {
-            Destroy(dotsContainer.GetChild(i).gameObject);
-        }
-
-        dots.Clear();
-        
-        for (int i = 0; i < amount; i++)
-        {
-            GameObject newDot = Instantiate(dotObj, dotsContainer);
-            dots.Add(newDot.GetComponent<RectTransform>());
         }
     }
 }

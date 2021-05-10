@@ -4349,7 +4349,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 550761005028112143, guid: 7c0f797d0955d4ff98de84b964c46c02, type: 3}
       propertyPath: m_Spacing
-      value: 5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 550761005028112143, guid: 7c0f797d0955d4ff98de84b964c46c02, type: 3}
       propertyPath: m_ChildControlWidth

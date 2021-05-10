@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -8,9 +9,6 @@ public class PageSwiper : MonoBehaviour, IDragHandler, IEndDragHandler
 
     private Vector3 panelLocation;
     public int currentPage = 1;
-    
-    public int gapPage = 1; // amount of page was moved by  pool
-
     public float percentThreshold = 0.2f;
     public float easing = 0.5f;
     public int totalPages = 1;
@@ -22,9 +20,14 @@ public class PageSwiper : MonoBehaviour, IDragHandler, IEndDragHandler
 
     public delegate void OnEndSwipe();
 	public event OnEndSwipe OnSwiped;
+
+    private RectTransform rectTransform;
+    private Vector3 defaultPageContainerPosition;
    
     private void Start()
     {
+        rectTransform = GetComponent<RectTransform>();
+        defaultPageContainerPosition = rectTransform.localPosition;
         initialPosition = transform.position;
         panelLocation = transform.position;
     }
@@ -100,9 +103,15 @@ public class PageSwiper : MonoBehaviour, IDragHandler, IEndDragHandler
         if(OnSwiped != null) OnSwiped.Invoke();
     }
 
+    public void ResetSwiper()
+    {
+        rectTransform.localPosition = defaultPageContainerPosition;
+        currentPage = 1;
+        panelLocation = initialPosition;
+    }
+
     private void OnDisable()
     {
-        currentPage = 1;
-        transform.position = panelLocation = initialPosition;
+        ResetSwiper();
     }
 }

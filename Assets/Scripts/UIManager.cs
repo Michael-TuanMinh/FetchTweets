@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using MyNamespace;
 using TMPro;
 using UnityEngine;
 
