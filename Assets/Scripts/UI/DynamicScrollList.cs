@@ -170,10 +170,8 @@ public class DynamicScrollList : MonoBehaviour
                     var _url = twitterManager.results.statuses[swiper.currentPage - 1].user.profile_image_url;
                     newPage.GetComponentInChildren<Tweet>().LoadTweet(_url, _publicName, _id, _tweet);
                 }
-                
             }
             
-
             UpdateDotsColor(swiper.currentPage);
         };
 
