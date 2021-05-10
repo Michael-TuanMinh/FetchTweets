@@ -58,6 +58,9 @@ public class DynamicScrollList : MonoBehaviour
 
     private List<RectTransform> dots = new List<RectTransform>();
 
+    [SerializeField] 
+    private int dotPoolAmount = 50;
+
     [SerializeField]
     private Color dotDisableColor;
 
@@ -73,12 +76,12 @@ public class DynamicScrollList : MonoBehaviour
     private int amountPerPage;
     private int itemsCounter = 0;
 
-    private TwitterManager twitterManager;
+    //private TwitterManager twitterManager;
     private List<GameObject> tweets = new List<GameObject>();
     
     private void Start()
     {
-        twitterManager = FindObjectOfType<TwitterManager>(); // TODO: Separate twitterManager from this script
+        //twitterManager = FindObjectOfType<TwitterManager>(); // TODO: Separate twitterManager from this script
         
         if(!refreshAfterEnable && spawnedAtStart)
         {
@@ -114,10 +117,22 @@ public class DynamicScrollList : MonoBehaviour
         // create dots
         if(totalPages > 1) // only create dots if have more than 1 page
         {
-            for (int i = 0; i < totalPages; i++)
+            if (usingPool)
             {
-                GameObject newDot = Instantiate(dotObj, dotsContainer);
-                dots.Add(newDot.GetComponent<RectTransform>());
+                for (int i = 0; i < dotPoolAmount; i++)
+                {
+                    GameObject newDot = Instantiate(dotObj, dotsContainer);
+                    dots.Add(newDot.GetComponent<RectTransform>());
+                    if(i >= totalPages) newDot.SetActive(false);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < totalPages; i++)
+                {
+                    GameObject newDot = Instantiate(dotObj, dotsContainer);
+                    dots.Add(newDot.GetComponent<RectTransform>());
+                }
             }
         }
         
@@ -130,14 +145,16 @@ public class DynamicScrollList : MonoBehaviour
     {
         for (int i = 0; i < dots.Count; i++)
         {
+            if(!dots[i].gameObject.activeInHierarchy) return;
             int dotIndex = i + 1 > dots.Count ? 1 : i + 1;
+            
             dots[i].GetComponent<Image>().color = dotIndex == _currentPage ? dotEnableColor: dotDisableColor;
         }
     }
 
     private void LoadPanels(int numberOfPanels)
     {
-        GameObject panelClone = Instantiate(ItemHolder) as GameObject;
+        GameObject panelClone = Instantiate(ItemHolder);
         
         PageSwiper swiper = ItemHolder.AddComponent<PageSwiper>();
         swiper.totalPages = numberOfPanels;
@@ -162,14 +179,14 @@ public class DynamicScrollList : MonoBehaviour
                     swiper.gapPage--;
                 }
 
-                if (swiper.currentPage < twitterManager.results.statuses.Length)
+                /*if (swiper.currentPage < twitterManager.results.statuses.Length)
                 {
                     var _publicName = twitterManager.results.statuses[swiper.currentPage - 1].user.screen_name;
                     var _id = twitterManager.results.statuses[swiper.currentPage - 1].user.name;
                     var _tweet = twitterManager.results.statuses[swiper.currentPage - 1].text;
                     var _url = twitterManager.results.statuses[swiper.currentPage - 1].user.profile_image_url;
                     newPage.GetComponentInChildren<Tweet>().LoadTweet(_url, _publicName, _id, _tweet);
-                }
+                }*/
             }
             
             UpdateDotsColor(swiper.currentPage);
@@ -223,20 +240,20 @@ public class DynamicScrollList : MonoBehaviour
             icon.transform.SetParent(parentObject.transform);
             tweets.Add(icon);
 
-            if (itemsCounter - 1 < twitterManager.results.statuses.Length)
+            /*if (itemsCounter - 1 < twitterManager.results.statuses.Length)
             {
                 var _publicName = twitterManager.results.statuses[itemsCounter - 1].user.screen_name;
                 var _id = twitterManager.results.statuses[itemsCounter - 1].user.name;
                 var _tweet = twitterManager.results.statuses[itemsCounter - 1].text;
                 var _url = twitterManager.results.statuses[itemsCounter - 1].user.profile_image_url;
                 icon.GetComponent<Tweet>().LoadTweet(_url, _publicName, _id, _tweet);
-            }
+            }*/
         }
     }
 
     public void RefreshAllElements()
     {
-        for (int i = 0; i < tweets.Count; i++)
+        /*for (int i = 0; i < tweets.Count; i++)
         {
             if (i >= twitterManager.results.statuses.Length)
             {
@@ -248,7 +265,7 @@ public class DynamicScrollList : MonoBehaviour
             var _tweet = twitterManager.results.statuses[i].text;
             var _url = twitterManager.results.statuses[i].user.profile_image_url;
             tweets[i].GetComponent<Tweet>().LoadTweet(_url, _publicName, _id, _tweet);
-        }
+        }*/
     }
 
     private void OnDisable() 
@@ -278,20 +295,48 @@ public class DynamicScrollList : MonoBehaviour
     {
         if (numberOfItems == 0)
         {
-            numberOfItems =  twitterManager.results.statuses.Length;
+            numberOfItems =  numOfResults;
             Spawn();
         }
-        else 
+        else if (numOfResults > numberOfItems)
         {
-            if (twitterManager.results.statuses.Length > numberOfItems)
+            PageSwiper swiper = ItemHolder.AddComponent<PageSwiper>();
+            swiper.totalPages = numOfResults;
+
+            if (numOfResults < dots.Count)
             {
-                var swiper = GetComponentInChildren<PageSwiper>();
-                numberOfItems = twitterManager.results.statuses.Length;
-                swiper.totalPages = twitterManager.results.statuses.Length;
+                // if the number of results is less than the amount of dots that were already spawned in the pool
+                for (int i = numberOfItems; i < numOfResults; i++)
+                {
+                    dots[i].gameObject.SetActive(true);
+                }
             }
+            else
+            {
+                // if the amount of results is more than pool's size, enable all items in the pool first, then instantiate more 
                 
-            RespawnDots(twitterManager.results.statuses.Length);
-            RefreshAllElements();
+                for (int i = numberOfItems; i < dots.Count; i++)
+                {
+                    dots[i].gameObject.SetActive(true);
+                }
+                
+                for (int i = 0; i < numOfResults - numberOfItems; i++)
+                {
+                    GameObject newDot = Instantiate(dotObj, dotsContainer);
+                    dots.Add(newDot.GetComponent<RectTransform>());
+                }
+            }
+            
+            numberOfItems = numOfResults;
+            
+            UpdateDotsColor(1);
+        }
+        else
+        {
+            for (int i = 0; i < numberOfItems - numOfResults; i++)
+            {
+                
+            }
         }
     }
 
