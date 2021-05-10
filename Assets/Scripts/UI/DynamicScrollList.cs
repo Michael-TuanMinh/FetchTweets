@@ -328,15 +328,17 @@ public class DynamicScrollList : MonoBehaviour
             }
             
             numberOfItems = numOfResults;
-            
             UpdateDotsColor(1);
         }
         else
         {
-            for (int i = 0; i < numberOfItems - numOfResults; i++)
+            for (int i = 1; i <= numberOfItems - numOfResults; i++)
             {
-                
+                dots[numberOfItems - i].gameObject.SetActive(false);
             }
+            
+            numberOfItems = numOfResults;
+            UpdateDotsColor(1);
         }
     }
 
