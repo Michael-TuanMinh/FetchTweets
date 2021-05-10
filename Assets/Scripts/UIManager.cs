@@ -7,8 +7,6 @@ using UnityEngine;
 public class UIManager : MonoBehaviour
 {
     [SerializeField] private TwitterManager twitterManager;
-
-    [SerializeField] private DynamicScrollList dynamicScrollList;
     
     [Header("UI")]
     [SerializeField] 
@@ -59,27 +57,6 @@ public class UIManager : MonoBehaviour
         }
 
         twitterManager.Search(keyWord, searchLimit , language, searchTypeDropdown.options[searchTypeDropdown.value].text);
-        
-        twitterManager.OnLoadedData = ()=>
-        {
-            if (dynamicScrollList.numberOfItems == 0)
-            {
-                dynamicScrollList.numberOfItems =  twitterManager.results.statuses.Length;
-                dynamicScrollList.Spawn();
-            }
-            else 
-            {
-                if (twitterManager.results.statuses.Length > dynamicScrollList.numberOfItems)
-                {
-                    var swiper = dynamicScrollList.GetComponentInChildren<PageSwiper>();
-                    dynamicScrollList.numberOfItems = twitterManager.results.statuses.Length;
-                    swiper.totalPages = twitterManager.results.statuses.Length;
-                }
-                
-                dynamicScrollList.RespawnDots(twitterManager.results.statuses.Length);
-                dynamicScrollList.RefreshAllElements();
-            }
-        };
     }
     
     

@@ -39,9 +39,14 @@ public class Tweet : MonoBehaviour
                 if (unityWebRequest.isDone)
                 {
                     var texture = DownloadHandlerTexture.GetContent(unityWebRequest);
-                    var rect = new Rect(0, 0, texture.width, texture.height);
-                    var _sprite = Sprite.Create(texture,rect,new Vector2(0.5f,0.5f));
-                    avatar.sprite = _sprite;
+                    
+                    if (texture)
+                    {
+                        var rect = new Rect(0, 0, texture.width, texture.height);
+                        var _sprite = Sprite.Create(texture,rect,new Vector2(0.5f,0.5f));
+                        avatar.sprite = _sprite;
+                    }
+
                 }
             }
         }

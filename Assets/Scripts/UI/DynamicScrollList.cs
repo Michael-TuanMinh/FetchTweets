@@ -274,6 +274,27 @@ public class DynamicScrollList : MonoBehaviour
         
     }
 
+    public void OnFinishedSearching(int numOfResults)
+    {
+        if (numberOfItems == 0)
+        {
+            numberOfItems =  twitterManager.results.statuses.Length;
+            Spawn();
+        }
+        else 
+        {
+            if (twitterManager.results.statuses.Length > numberOfItems)
+            {
+                var swiper = GetComponentInChildren<PageSwiper>();
+                numberOfItems = twitterManager.results.statuses.Length;
+                swiper.totalPages = twitterManager.results.statuses.Length;
+            }
+                
+            RespawnDots(twitterManager.results.statuses.Length);
+            RefreshAllElements();
+        }
+    }
+
     public void RespawnDots(int amount)
     {
         for (int i = 0; i < dotsContainer.childCount; i++)

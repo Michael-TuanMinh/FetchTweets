@@ -16,12 +16,13 @@ namespace MyNamespace
     
     [SerializeField]
     private string twitterApiConsumerSecret;
+    
+    [SerializeField] 
+    private GameEvent OnFinishedSearching;
 
     private Token token;
 
-    public SearchResults results;
-
-    public Action OnLoadedData;
+    public SearchResults results; // TODO: Set it to private in production
 
     private void Start()
     {
@@ -57,7 +58,7 @@ namespace MyNamespace
         HandleWebRequestResult(webRequest, () =>
         {
             results = JsonUtility.FromJson<SearchResults>(webRequest.downloadHandler.text);
-            OnLoadedData?.Invoke();
+            OnFinishedSearching.Raise(results.statuses.Length);
         });
     }
     
