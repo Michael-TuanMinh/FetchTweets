@@ -179,8 +179,7 @@ public class DynamicScrollList : MonoBehaviour
 
         for (int i = 1; i <= toBeSpawnedAmount; i++)
         {
-            GameObject panel = Instantiate(panelClone) as GameObject;
-            panel.transform.SetParent(mCanvas.transform, false);
+            GameObject panel = Instantiate(panelClone, mCanvas.transform, false);
             panel.transform.SetParent(ItemHolder.transform);
             panel.name = "Page-" + i;
             

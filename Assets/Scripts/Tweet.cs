@@ -24,6 +24,8 @@ public class Tweet : MonoBehaviour
     
     IEnumerator LoadImage(string url) 
     {
+        if(string.IsNullOrEmpty(url)) yield break;
+        
         using(var unityWebRequest = UnityWebRequestTexture.GetTexture(url))
         {
             yield return unityWebRequest.SendWebRequest();
