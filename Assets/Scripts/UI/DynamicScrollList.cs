@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http.Headers;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,7 +15,7 @@ public class DynamicScrollList : MonoBehaviour
     [SerializeField] 
     private int poolAmount;
 
-    private Queue<GameObject> pool = new Queue<GameObject>();
+    private Stack<GameObject> pool = new Stack<GameObject>();
 
 
     #endregion
@@ -76,12 +75,12 @@ public class DynamicScrollList : MonoBehaviour
     private int amountPerPage;
     private int itemsCounter = 0;
 
-    //private TwitterManager twitterManager;
+    private TwitterManager twitterManager;
     private List<GameObject> tweets = new List<GameObject>();
     
     private void Start()
     {
-        //twitterManager = FindObjectOfType<TwitterManager>(); // TODO: Separate twitterManager from this script
+        twitterManager = FindObjectOfType<TwitterManager>(); // TODO: Separate twitterManager from this script
         
         if(!refreshAfterEnable && spawnedAtStart)
         {
@@ -165,19 +164,16 @@ public class DynamicScrollList : MonoBehaviour
             // reposition page for pool
             if (usingPool)
             {
-                var newPage = pool.Dequeue();
+                var newPage = pool.Pop();
                 newPage.GetComponent<RectTransform>().localPosition = direction == Direction.Horizontal ? new Vector2(mCanvas.GetComponent<RectTransform>().rect.width * (swiper.currentPage - 1), 0)
                     : new Vector2(0, - mCanvas.GetComponent<RectTransform>().rect.height * (swiper.currentPage - 1));
-                pool.Enqueue(newPage);
+                pool.Push(newPage);
                 
-                /*if (swiper.currentPage < twitterManager.results.statuses.Length)
-                {
-                    var _publicName = twitterManager.results.statuses[swiper.currentPage - 1].user.screen_name;
-                    var _id = twitterManager.results.statuses[swiper.currentPage - 1].user.name;
-                    var _tweet = twitterManager.results.statuses[swiper.currentPage - 1].text;
-                    var _url = twitterManager.results.statuses[swiper.currentPage - 1].user.profile_image_url;
-                    newPage.GetComponentInChildren<Tweet>().LoadTweet(_url, _publicName, _id, _tweet);
-                }*/
+                var _publicName = twitterManager.results.statuses[swiper.currentPage - 1].user.screen_name;
+                var _id = twitterManager.results.statuses[swiper.currentPage - 1].user.name;
+                var _tweet = twitterManager.results.statuses[swiper.currentPage - 1].text;
+                var _url = twitterManager.results.statuses[swiper.currentPage - 1].user.profile_image_url;
+                newPage.GetComponentInChildren<Tweet>().LoadTweet(_url, _publicName, _id, _tweet);
             }
             
             UpdateDotsColor(swiper.currentPage);
@@ -194,7 +190,7 @@ public class DynamicScrollList : MonoBehaviour
             
             if (usingPool)
             {
-                pool.Enqueue(panel);
+                pool.Push(panel);
             }
 
             panel.GetComponent<RectTransform>().localPosition = direction == Direction.Horizontal ? new Vector2(mCanvas.GetComponent<RectTransform>().rect.width * (i - 1), 0)
@@ -230,15 +226,6 @@ public class DynamicScrollList : MonoBehaviour
             GameObject icon = Instantiate(Item, mCanvas.transform, false);
             icon.transform.SetParent(parentObject.transform);
             tweets.Add(icon);
-
-            /*if (itemsCounter - 1 < twitterManager.results.statuses.Length)
-            {
-                var _publicName = twitterManager.results.statuses[itemsCounter - 1].user.screen_name;
-                var _id = twitterManager.results.statuses[itemsCounter - 1].user.name;
-                var _tweet = twitterManager.results.statuses[itemsCounter - 1].text;
-                var _url = twitterManager.results.statuses[itemsCounter - 1].user.profile_image_url;
-                icon.GetComponent<Tweet>().LoadTweet(_url, _publicName, _id, _tweet);
-            }*/
         }
     }
     
@@ -265,6 +252,8 @@ public class DynamicScrollList : MonoBehaviour
 
     public void OnFinishedSearching(int numOfResults)
     {
+        if(numOfResults == 0) return;
+        
         if (numberOfItems == 0)
         {
             numberOfItems =  numOfResults;
@@ -318,5 +307,11 @@ public class DynamicScrollList : MonoBehaviour
             numberOfItems = numOfResults;
             UpdateDotsColor(1);
         }
+        
+        var _publicName = twitterManager.results.statuses[0].user.screen_name;
+        var _id = twitterManager.results.statuses[0].user.name;
+        var _tweet = twitterManager.results.statuses[0].text;
+        var _url = twitterManager.results.statuses[0].user.profile_image_url;
+        tweets[0].GetComponentInChildren<Tweet>().LoadTweet(_url, _publicName, _id, _tweet);
     }
 }

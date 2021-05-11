@@ -16,6 +16,9 @@ public class TwitterManager : MonoBehaviour
     
     [SerializeField] 
     private GameEvent OnFinishedSearching;
+    
+    [SerializeField] 
+    private GameEvent OnRecievedError;
 
     private Token token;
 
@@ -81,10 +84,10 @@ public class TwitterManager : MonoBehaviour
         {
             case UnityWebRequest.Result.ConnectionError:
             case UnityWebRequest.Result.DataProcessingError:
-                Debug.LogError("Error: " + _webRequest.error);
+                OnRecievedError.Raise("Error: " + _webRequest.error);
                 break;
             case UnityWebRequest.Result.ProtocolError:
-                Debug.LogError("HTTP Error: " + _webRequest.error);
+                OnRecievedError.Raise("HTTP Error: " + _webRequest.error);
                 break;
             case UnityWebRequest.Result.Success:
                 _onSuceed?.Invoke();

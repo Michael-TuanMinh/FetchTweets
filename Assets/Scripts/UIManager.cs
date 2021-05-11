@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -19,6 +20,8 @@ public class UIManager : MonoBehaviour
     
     [SerializeField] 
     private TMP_Dropdown searchLimitDropdown;
+
+    [SerializeField] private TextMeshProUGUI prompText;
     
     private enum Language
     {
@@ -57,6 +60,17 @@ public class UIManager : MonoBehaviour
 
         twitterManager.Search(keyWord, searchLimit , language, searchTypeDropdown.options[searchTypeDropdown.value].text);
     }
-    
-    
+
+    public void OnReceivedError(string _error)
+    {
+        prompText.enabled = true;
+        prompText.text = "Failed to load data. " + _error;
+        StartCoroutine(DisablePrompText());
+    }
+
+    private IEnumerator DisablePrompText()
+    {
+        yield return new WaitForSeconds(1);
+        prompText.enabled = false;
+    }
 }
