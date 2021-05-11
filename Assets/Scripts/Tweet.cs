@@ -13,6 +13,9 @@ public class Tweet : MonoBehaviour
     [SerializeField] private TextMeshProUGUI id;
 
     [SerializeField] private TextMeshProUGUI tweet;
+    
+    [SerializeField] 
+    private GameEvent OnRecievedError;
 
     public void LoadTweet(string _imageURL, string _publicName, string _id, string _tweet)
     {
@@ -30,16 +33,16 @@ public class Tweet : MonoBehaviour
         {
             yield return unityWebRequest.SendWebRequest();
 
-            if (unityWebRequest.result == UnityWebRequest.Result.ConnectionError)
+            if (unityWebRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log(unityWebRequest.error);
+                OnRecievedError.Raise(unityWebRequest.error);
             }
             else
             {
                 if (unityWebRequest.isDone)
                 {
                     var texture = DownloadHandlerTexture.GetContent(unityWebRequest);
-                    
+
                     if (texture)
                     {
                         var rect = new Rect(0, 0, texture.width, texture.height);

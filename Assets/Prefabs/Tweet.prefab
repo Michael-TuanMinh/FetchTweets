@@ -634,6 +634,7 @@ MonoBehaviour:
   publicName: {fileID: 9210446912696520782}
   id: {fileID: 9210446912960275930}
   tweet: {fileID: 9210446913973942191}
+  OnRecievedError: {fileID: 11400000, guid: c7e1756739adb43d192279b970b5a53f, type: 2}
 --- !u!114 &9210446914046100125
 MonoBehaviour:
   m_ObjectHideFlags: 0

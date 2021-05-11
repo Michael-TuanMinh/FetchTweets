@@ -308,10 +308,12 @@ public class DynamicScrollList : MonoBehaviour
             UpdateDotsColor(1);
         }
         
+        if(tweets.Count == 0) return;
+        
         var _publicName = twitterManager.results.statuses[0].user.screen_name;
         var _id = twitterManager.results.statuses[0].user.name;
         var _tweet = twitterManager.results.statuses[0].text;
         var _url = twitterManager.results.statuses[0].user.profile_image_url;
-        tweets[0].GetComponentInChildren<Tweet>().LoadTweet(_url, _publicName, _id, _tweet);
+        tweets[0].GetComponentInChildren<Tweet>()?.LoadTweet(_url, _publicName, _id, _tweet);
     }
 }

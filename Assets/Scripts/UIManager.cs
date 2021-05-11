@@ -70,7 +70,7 @@ public class UIManager : MonoBehaviour
 
     private IEnumerator DisablePrompText()
     {
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(1.5f);
         prompText.enabled = false;
     }
 }

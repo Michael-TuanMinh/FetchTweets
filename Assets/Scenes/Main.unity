@@ -3610,8 +3610,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37bcee9f1c370da49a69da238ac22781, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Events: []
-  ParameterType: 0
+  Events:
+  - {fileID: 11400000, guid: c7e1756739adb43d192279b970b5a53f, type: 2}
+  ParameterType: 4
   Response:
     m_PersistentCalls:
       m_Calls: []
@@ -5370,11 +5371,11 @@ RectTransform:
   m_Father: {fileID: 1254592633}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 500, y: 50}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: -130}
+  m_SizeDelta: {x: -99.99999, y: 20}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1873366245
 MonoBehaviour:
   m_ObjectHideFlags: 0
