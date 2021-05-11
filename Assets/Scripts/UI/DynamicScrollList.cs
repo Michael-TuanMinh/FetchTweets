@@ -283,7 +283,7 @@ public class DynamicScrollList : MonoBehaviour
 
             if (numOfResults > numberOfItems)
             {
-                if (numOfResults < dots.Count)
+                if (numOfResults <= dots.Count)
                 {
                     // if the number of results is less than the amount of dots that were already spawned in the pool
                     for (int i = numberOfItems; i < numOfResults; i++)
@@ -294,13 +294,13 @@ public class DynamicScrollList : MonoBehaviour
                 else
                 {
                     // if the amount of results is more than pool's size, enable all items in the pool first, then instantiate more 
-                
                     for (int i = numberOfItems; i < dots.Count; i++)
                     {
                         dots[i].gameObject.SetActive(true);
                     }
-                
-                    for (int i = 0; i < numOfResults - numberOfItems; i++)
+
+                    int currentAmount = dots.Count;
+                    for (int i = 0; i < numOfResults - currentAmount; i++)
                     {
                         GameObject newDot = Instantiate(dotObj, dotsContainer);
                         dots.Add(newDot.GetComponent<RectTransform>());
